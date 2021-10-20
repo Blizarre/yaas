@@ -1,0 +1,27 @@
+version: "3.9"  # optional since v1.27.0
+
+services:
+  web:
+    build: .
+    ports:
+      - "12345:5000"
+    links:
+      - redis
+      - celery
+    environment:
+      REDIS_URL: "redis://redis:6379/0"
+    command: flask run --host=0.0.0.0
+  redis:
+    image: redis
+  celery:
+    volumes:
+      - ./youtube_files:/youtube_files
+    build: .
+    command: celery -A tasks worker --loglevel=INFO
+    links:
+      - redis
+    environment:
+      REDIS_URL: "redis://redis:6379/0"
+      VIDEO_DIR: "/youtube_files"
+volumes:
+  logvolume01: {}
