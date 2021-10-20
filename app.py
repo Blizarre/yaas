@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect
 
 from tasks import download as celery_download
 import os
@@ -23,24 +23,25 @@ def download(youtube_id: str):
         title = ydl.extract_info(url, download=False, process=True)["title"]
     file = File(youtube_id, title, celery_download.delay(url))
     in_progress[youtube_id] = file
-    return title
+    return redirect("/status", code=302)
 
 @app.route("/status")
 def status():
     ret = ""
     for youtube_id, infos in in_progress.items():
+        result = infos.promise.result
         info = infos.promise.info
-        if isinstance(info, DownloadError):
-            ret += (
-                f'{youtube_id} {infos.title} - '
-                f'Erreur'
-            )
-        else:
-            ret += (
-                f'{youtube_id} {infos.title} - '
-                f'{"Termine" if infos.promise.ready() else "En cours"}, '
-                f'{info.get("_percent_str")}%, Taille totale {info.get("_total_bytes_str")}<br/>'
-            )
+
+        ret += (
+            f'{youtube_id} {infos.title} - '
+            f'{"Termine" if infos.promise.ready() else "En cours"}, '
+        )
+
+        if isinstance(result, DownloadError):
+            ret += f'Erreur'
+        elif info is not None:
+            ret += f'{info.get("_percent_str")}%, Taille totale {info.get("_total_bytes_str")}'
+        ret += '<br/>'
     return ret
 
 if __name__ == "__main__":
