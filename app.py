@@ -5,6 +5,7 @@ import os
 from werkzeug.exceptions import BadRequest
 import youtube_dl as y
 from collections import namedtuple
+from youtube_dl.utils import DownloadError
 
 app = Flask(__name__)
 
@@ -28,7 +29,18 @@ def download(youtube_id: str):
 def status():
     ret = ""
     for youtube_id, infos in in_progress.items():
-        ret += f'{youtube_id} {infos.title} - {"Done" if infos.promise.ready() else "In Progress"}<br/>'
+        info = infos.promise.info
+        if isinstance(info, DownloadError):
+            ret += (
+                f'{youtube_id} {infos.title} - '
+                f'Erreur'
+            )
+        else:
+            ret += (
+                f'{youtube_id} {infos.title} - '
+                f'{"Termine" if infos.promise.ready() else "En cours"}, '
+                f'{info.get("_percent_str")}%, Taille totale {info.get("_total_bytes_str")}<br/>'
+            )
     return ret
 
 if __name__ == "__main__":

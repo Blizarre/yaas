@@ -10,9 +10,14 @@ app = Celery('tasks', broker=REDIS_URL, backend=REDIS_URL)
 
 logger = logging.Logger(__name__)
 
-@app.task
-def download(url: str):
+@app.task(bind=True)
+def download(self, url: str):
+    def progress_hook(data):
+        if data.get("status") in ["downloading", "finished"]:
+            self.update_state(state='PROGRESS',
+                            meta=data)
+
     logger.info(f"Starting dl task for {url}")
-    with y.YoutubeDL({"outtmpl": os.path.join(VIDEO_DIR, FILE_NAME_TEMPLATE)}) as ydl:
+    with y.YoutubeDL({'progress_hooks': [progress_hook],"outtmpl": os.path.join(VIDEO_DIR, FILE_NAME_TEMPLATE)}) as ydl:
         ydl.download([url])
     logger.info(f"Finished dl task for {url} successfully")
