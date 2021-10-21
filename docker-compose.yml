@@ -10,6 +10,7 @@ services:
       - celery
     environment:
       REDIS_URL: "redis://redis:6379/0"
+      VIDEO_DIR: "/youtube_files"
     command: flask run --host=0.0.0.0
   redis:
     image: redis
