@@ -10,5 +10,4 @@ RUN pip install -r requirements.txt
 COPY app.py tasks.py /server/
 COPY templates/ /server/templates
 
-USER 10000
-
+USER nobody:nobody
