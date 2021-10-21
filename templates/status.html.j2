@@ -1,0 +1,26 @@
+{% extends 'base.html.j2' %}
+
+{% block header %}
+<h1 class="mb-2">
+  {% block title %}Status des telechargements{% endblock %} <a href="/status" style="text-decoration: none">🔄</a>
+</h1>
+{% endblock %}
+
+{% block content %}
+<ul>
+  {% if (not in_progress) %}
+      - Pas de Telechargements en cours -
+  {% endif %}
+  {% for info in in_progress %}
+  <li><strong>{{info.title}}</strong>
+    {% if (has_failed(info)) %}
+        - Erreur: {{info.promise.result}}
+    {% elif (info.promise.ready()) %}
+        - <a class="btn btn-outline-secondary btn-sm" href="/files">Voir dans l'explorateur</a>
+    {% elif (info.promise.info is not none) %}
+        - {{info.promise.info.get("_percent_str")}}, Taille totale {{info.promise.info.get("_total_bytes_str", "inconnue")}}
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
