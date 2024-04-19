@@ -3,7 +3,7 @@ from python:3.9
 WORKDIR /server
 
 RUN groupadd -r yaas && \
-       useradd --no-log-init -r -g yaas yaas && \
+       useradd --no-log-init -m -r -g yaas yaas && \
        mkdir /youtube_files && \
        chown yaas:yaas /youtube_files
 

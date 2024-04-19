@@ -1,6 +1,6 @@
 from celery import Celery
 import logging
-import youtube_dl as y
+import yt_dlp as y
 import os
 
 VIDEO_DIR = os.environ["VIDEO_DIR"]

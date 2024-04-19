@@ -3,9 +3,9 @@ from collections import deque
 from tasks import download as celery_download, clean as celery_clean
 import os
 from werkzeug.exceptions import BadRequest
-import youtube_dl as y
+import yt_dlp as y
 from collections import namedtuple
-from youtube_dl.utils import DownloadError
+from yt_dlp.utils import DownloadError
 import logging
 
 logger = logging.Logger(__name__)
@@ -21,15 +21,13 @@ def has_failed(file: File):
 
 @app.route("/download", methods = ['POST'])
 def download():
-    logger.error(request.form)
     if "videourl" not in request.form:
         raise BadRequest("Video inconnue")
     format = request.form.get("format")
     if format == "normal":
         format = None
     url = request.form["videourl"]
-    ydl_opts = {}
-    with y.YoutubeDL(ydl_opts) as ydl:
+    with y.YoutubeDL() as ydl:
         title = ydl.extract_info(url, download=False, process=True)["title"]
     file = File(title, celery_download.delay(url, format))
     in_progress.appendleft(file)
