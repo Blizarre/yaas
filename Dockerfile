@@ -1,4 +1,4 @@
-from python:3.9
+from python:3.12
 
 WORKDIR /server
 
