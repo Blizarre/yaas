@@ -1,3 +1,5 @@
+**Note:** *This repository has been archived as my cloud provider has been blacklisted by YouTube and I am no longer able to use this project. Besides, the latest versions of the YouTube downloader libraries have managed to get around the bandwidth throttling issue which was the primary reason I created this project.*
+
 # Youtube-dl as a service
 
 A very simple front-end for [youtube-dl](https://youtube-dl.org/). Used to download videos from [Youtube](https://www.youtube.com/) and other popular video services into the server and then provide a mean to browse and download the files.
